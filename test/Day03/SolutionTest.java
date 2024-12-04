@@ -12,4 +12,11 @@ class SolutionTest {
         int result = Solution.multiplyNumbers(input);
         assertEquals(161, result);
     }
+
+    @Test
+    void multiplyNumbersWithApproval() {
+        String input = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
+        int result = Solution.multiplyNumbersWithApproval(input);
+        assertEquals(48, result);
+    }
 }
