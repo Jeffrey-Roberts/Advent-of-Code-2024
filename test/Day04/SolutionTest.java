@@ -23,4 +23,22 @@ class SolutionTest {
         int result = Solution.findXmasOccurrences(input);
         assertEquals(18, result);
     }
+
+    @Test
+    void findX_masOccurrences() {
+        String input = """
+                MMMSXXMASM
+                MSAMXMSMSA
+                AMXSXMAAMM
+                MSAMASMSMX
+                XMASAMXAMM
+                XXAMMXXAMA
+                SMSMSASXSS
+                SAXAMASAAA
+                MAMMMXMMMM
+                MXMXAXMASX
+                """;
+        int result = Solution.findX_masOccurrences(input);
+        assertEquals(9, result);
+    }
 }
