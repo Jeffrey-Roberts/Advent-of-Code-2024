@@ -38,14 +38,28 @@ public class Solution {
             antinodes.addAll(placeAntinode(antenna.getKey(), antenna.getValue()));
         }
 
-        return antinodes.stream().filter(antinode -> {
-            Vector location = antinode.location;
-            if (location.y < 0) return false;
-            if (location.y >= map.size()) return false;
-            if (location.x < 0) return false;
-            if (location.x >= map.getFirst().size()) return false;
-            return true;
-        }).toList();
+        return antinodes.stream().filter(antinode -> isAntinodeInBounds(antinode, map)).toList();
+    }
+
+    public static List<Antinode> calculateAntinodesWithResonantHarmonics(String input) {
+        List<List<String >> map = parseInput(input);
+        Map<String, List<Vector>> antennas = locateAntennas(map);
+        Set<Antinode> antinodes = new HashSet<>();
+
+        for (Map.Entry<String, List<Vector>> antenna : antennas.entrySet()) {
+            antinodes.addAll(placeManyAntinode(antenna.getKey(), antenna.getValue(), map));
+        }
+
+        return antinodes.stream().filter(antinode -> isAntinodeInBounds(antinode, map)).toList();
+    }
+
+    private static boolean isAntinodeInBounds(Antinode antinode, List<List<String>> map) {
+        Vector location = antinode.location;
+        if (location.y < 0) return false;
+        if (location.y >= map.size()) return false;
+        if (location.x < 0) return false;
+        if (location.x >= map.getFirst().size()) return false;
+        return true;
     }
 
     private static List<List<String>> parseInput(String input) {
@@ -85,6 +99,31 @@ public class Solution {
         return antinodes;
     }
 
+    private static Set<Antinode> placeManyAntinode(String frequency, List<Vector> locations, List<List<String>> map) {
+        Set<Antinode>  antinodes = new HashSet<>();
+        for (int i = 0; i < locations.size(); i++) {
+            for (int j = 0; j < locations.size(); j++) {
+                if (i == j) continue;
+                Vector current = locations.get(i);
+                Vector target = locations.get(j);
+                Vector relativeLocationToCurrent = subtractVectors(current, target);
+
+                antinodes.add(new Antinode(frequency, current));
+
+                int scalar = 1;
+                Vector location;
+                Antinode newAntinode;
+                do {
+                    location = addVectors(current, scalarMultiply(relativeLocationToCurrent, scalar));
+                    newAntinode = new Antinode(frequency, location);
+                    antinodes.add(newAntinode);
+                    scalar++;
+                } while (isAntinodeInBounds(newAntinode, map));
+            }
+        }
+        return antinodes;
+    }
+
     private static Vector subtractVectors(Vector current, Vector target) {
         return new Vector(current.x - target.x, current.y - target.y);
     }
@@ -93,8 +132,12 @@ public class Solution {
         return new Vector(current.x + target.x, current.y + target.y);
     }
 
+    private static Vector scalarMultiply(Vector vector, int scalar) {
+        return new Vector(vector.x * scalar, vector.y * scalar);
+    }
+
     public static void main() {
-        String part1Input = """
+        String input = """
                 ...............................6.B..........P.....
                 n..............M..................................
                 ....n.....sM7.............................6.....p.
@@ -146,6 +189,7 @@ public class Solution {
                 ..............D.......c..................9..0.....
                 ............................1..........O..9.......
                 """;
-        System.out.println(calculateAntinodes(part1Input).size());
+        System.out.println(calculateAntinodes(input).size());
+        System.out.println(calculateAntinodesWithResonantHarmonics(input).size());
     }
 }
