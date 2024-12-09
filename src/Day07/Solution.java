@@ -6,12 +6,18 @@ import java.util.*;
 public class Solution {
     public record Calibration(BigInteger result, List<BigInteger> operands) {}
 
-    public static String findValidEquations(String input) {
+    public enum Operation {
+        ADD,
+        MULTIPLY,
+        CONCAT
+    }
+
+    public static String findValidEquations(String input, Set<Operation> operations) {
        List<Calibration> calibrations = parseInput(input);
 
        BigInteger totalCalibrationResults = new BigInteger("0");
        List<Calibration> validCalibrations = calibrations.stream()
-               .filter(calibration -> isValidEquation(calibration, 1, List.of(calibration.operands.getFirst()))).toList();
+               .filter(calibration -> isValidEquation(calibration, 1, List.of(calibration.operands.getFirst()), operations)).toList();
 
        for (Calibration calibration : validCalibrations) totalCalibrationResults = totalCalibrationResults.add(calibration.result);
 
@@ -29,25 +35,28 @@ public class Solution {
         return calibrations;
     }
 
-    private static boolean isValidEquation(Calibration calibration, int index, List<BigInteger> queue) {
+    private static boolean isValidEquation(Calibration calibration, int index, List<BigInteger> queue, Set<Operation> operations) {
         BigInteger result = calibration.result;
         List<BigInteger> operands = calibration.operands;
         if (index == operands.size()) return queue.contains(result);
 
         List<BigInteger> newQueue = new ArrayList<>();
         for (BigInteger element : queue) {
-            BigInteger product = operands.get(index).multiply(element);
-            BigInteger sum = operands.get(index).add(element);
-
-            if (product.compareTo(result) <= 0) newQueue.addLast(product);
-            if (sum.compareTo(result) <= 0) newQueue.addLast(sum);
+            for (Operation operation : operations) {
+                BigInteger value = switch (operation) {
+                    case ADD -> operands.get(index).add(element);
+                    case MULTIPLY -> operands.get(index).multiply(element);
+                    case CONCAT -> new BigInteger(element.toString() + operands.get(index).toString());
+                };
+                if (value.compareTo(result) <= 0) newQueue.add(value);
+            }
         }
 
-        return isValidEquation(calibration, index+1, newQueue);
+        return isValidEquation(calibration, index+1, newQueue, operations);
     }
 
     public static void main() {
-        String part1Input = """
+        String input = """
                 26529145: 55 2 60 801 22
                 15644706: 5 7 8 1 7 9 3 6 621 3 9 6
                 7232028116: 96 8 358 21 1 2 3 693 3
@@ -899,6 +908,9 @@ public class Solution {
                 1050908860: 1 6 8 5 93 443 20
                 11656181041: 194 2 724 5 888 62 23
                 """;
-        System.out.println(findValidEquations(part1Input));
+        Set<Operation> part1Operations = Set.of(Operation.ADD, Operation.MULTIPLY);
+        System.out.println(findValidEquations(input, part1Operations));
+        Set<Operation> part2Operations = Set.of(Operation.ADD, Operation.MULTIPLY, Operation.CONCAT);
+        System.out.println(findValidEquations(input, part2Operations));
     }
 }
