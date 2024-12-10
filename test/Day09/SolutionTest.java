@@ -2,6 +2,8 @@ package Day09;
 
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SolutionTest {
@@ -9,7 +11,7 @@ class SolutionTest {
     @Test
     void compactHardDrive() {
         String input = "2333133121414131402";
-        int result = Solution.compactHardDrive(input);
-        assertEquals(1928, result);
+        BigInteger result = Solution.compactHardDrive(input);
+        assertEquals(new BigInteger("1928"), result);
     }
 }
