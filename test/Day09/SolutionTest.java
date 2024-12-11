@@ -9,9 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class SolutionTest {
 
     @Test
-    void compactHardDrive() {
+    void compactHardDriveByBlock() {
         String input = "2333133121414131402";
-        BigInteger result = Solution.compactHardDrive(input);
+        BigInteger result = Solution.compactHardDriveByBlock(input);
         assertEquals(new BigInteger("1928"), result);
+    }
+
+    @Test
+    void compactHardDriveByFile() {
+        String input = "2333133121414131402";
+        BigInteger result = Solution.compactHardDriveByFile(input);
+        assertEquals(new BigInteger("2858"), result);
     }
 }
